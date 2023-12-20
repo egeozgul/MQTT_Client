@@ -1,55 +1,88 @@
-from BLE_CEEO import Yell
-import time
-from hub import port
-import motor
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MQTT Message Command Tool</title>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+		
+		.parent {
+  border: 1px solid black;
+  margin: 1rem;
+  padding: 2rem 2rem;
+  text-align: center;
+}
+.child {
+  display: inline-block;
+  border: 1px solid red;
+  padding: 1rem 1rem;
+  vertical-align: middle;
+}
+    </style>
+    <script type="text/javascript">
+        const MQTT_BROKER = "broker.hivemq.com";
+        const MQTT_PORT = 8000; // Use 8884 for TLS
+        const MQTT_TOPIC = "SPIKE"; // Replace with your topic
 
-motors =[port.A, port.C]
+        var client = mqtt.connect(`ws://${MQTT_BROKER}:${MQTT_PORT}/mqtt`);
 
-'''
-Small motor (essential): -660 to 660
-Medium motor: -1110 to 1110
-Large motor: -1050 to 1050
-'''
-def drive(speed):
-    motor.run(motors[0], speed)
-    motor.run(motors[1], speed)
+        function sendMessage(message) {
+            client.publish(MQTT_TOPIC, message);
+            console.log("Message sent: " + message);
+        }
+				
+		function mDown(obj,message) {
+		  obj.style.backgroundColor = "#1ec5e5";
+		  client.publish(MQTT_TOPIC, message);
+		  console.log("Message sent: " + message);
+		}
 
-def peripheral(name):
-    try:
-        p = Yell(name, verbose = True)
-        if p.connect_up():
-            print('P connected')
-            while True:
-                if p.is_any:
-                    cmd = p.read()
-                    print(cmd)
-                    speed = 100
-                    if 'fwd' in cmd:
-                        motor.run(motors[0], speed)
-                        motor.run(motors[1], speed)
-                    elif 'right' in cmd:
-                        motor.run(motors[0], -speed)
-                        motor.run(motors[1], speed)
-                    elif 'left' in cmd:
-                        motor.run(motors[0], speed)
-                        motor.run(motors[1], -speed)
-                    elif 'back' in cmd:
-                        motor.run(motors[0], -speed)
-                        motor.run(motors[1], -speed)
-                    elif 'off' in cmd:
-                        motor.run(motors[0], 0)
-                        motor.run(motors[1], 0)
-                        
-                if not p.is_connected:
-                    print('lost connection')
-                    break
-                time.sleep(0.5)
-    except Exception as e:
-        print(e)
-    finally:
-        p.disconnect()
-        drive(0)
-        print('closing up')
+		function mUp(obj,message) {
+		  obj.style.backgroundColor="#D94A38";
+		  client.publish(MQTT_TOPIC, message);
+		  console.log("Message sent: " + message);
+		}
 
-peripheral('Maria')
+    </script>
+</head>
+<body>
+    <h2>MQTT Message Sender</h2>
+    
+	<div class='parent'>
+	<div class='child' onmousedown="mDown(this,'fwd')" onmouseup="mUp(this,'off')"
+style="background-color:#D94A38;width:45px;height:10px;padding:40px;">
+forward</div>
 
+	<div class='child' onmousedown="mDown(this,'back')" onmouseup="mUp(this,'off')"
+style="background-color:#D94A38;width:45px;height:10px;padding:40px;">
+back</div>
+
+	<div class='child' onmousedown="mDown(this,'right')" onmouseup="mUp(this,'off')"
+style="background-color:#D94A38;width:45px;height:10px;padding:40px;">
+right</div>
+
+	<div class='child' onmousedown="mDown(this,'left')" onmouseup="mUp(this,'off')"
+style="background-color:#D94A38;width:45px;height:10px;padding:40px;">
+left</div>
+
+</div>
+
+</body>
+</html>

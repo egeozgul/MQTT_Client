@@ -10,4 +10,4 @@ This web application enables users to send MQTT messages to a broker, ideal for 
 - Customizable broker settings and topics.
 
 ## Usage
-Open the HTML file in a web browser. Click and hold any button to send a command, and release to send an 'off' command.
+Open the HTML file in a web browser (https://egeozgul.github.io/MQTT_Client/). Click and hold any button to send a command, and release to send an 'off' command.

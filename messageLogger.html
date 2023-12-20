@@ -32,10 +32,11 @@
     </style>
     <script type="text/javascript">
         const MQTT_BROKER = "broker.hivemq.com";
-        const MQTT_PORT = 8000; // Use 8000 for TLS
+		const MQTT_TLS_PORT = 8884; // Replace with the correct secure WebSocket port
         const MQTT_TOPIC = "SPIKE"; // Replace with your topic
 
-        var client = mqtt.connect(`ws://${MQTT_BROKER}:${MQTT_PORT}/mqtt`);
+// Change the protocol from ws to wss and use the secure WebSocket port, typically 8884
+var client = mqtt.connect(`wss://${MQTT_BROKER}:${MQTT_TLS_PORT}/mqtt`);
 
         client.on("connect", function () {
             client.subscribe(MQTT_TOPIC, function (err) {

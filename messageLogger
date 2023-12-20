@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MQTT Message Receiver</title>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 95%;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            width: 60%;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            height: 100%;
+        }
+        .log {
+            text-align: left;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 20px;
+            height: calc(100% - 40px - 40px); /* Adjust height taking into account padding */
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+    </style>
+    <script type="text/javascript">
+        const MQTT_BROKER = "broker.hivemq.com";
+        const MQTT_PORT = 8000; // Use 8000 for TLS
+        const MQTT_TOPIC = "SPIKE"; // Replace with your topic
+
+        var client = mqtt.connect(`ws://${MQTT_BROKER}:${MQTT_PORT}/mqtt`);
+
+        client.on("connect", function () {
+            client.subscribe(MQTT_TOPIC, function (err) {
+                if (!err) {
+                    console.log("Subscribed to " + MQTT_TOPIC);
+                    let msg = "Subscribed to " + MQTT_TOPIC;
+                    let log = document.getElementById("log");
+                    log.innerHTML += `<p><strong>${MQTT_TOPIC}:</strong> ${msg}</p>`;
+                    log.scrollTop = log.scrollHeight; // Auto-scroll to new message
+                }
+            });
+        });
+
+        client.on("message", function (topic, message) {
+            let msg = message.toString();
+            let log = document.getElementById("log");
+            log.innerHTML += `<p><strong>${topic}:</strong> ${msg}</p>`;
+            log.scrollTop = log.scrollHeight; // Auto-scroll to new message
+            console.log(topic + ": " + msg);
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>MQTT Message Receiver</h2>
+        <div id="log" class="log"></div>
+    </div>
+</body>
+</html>

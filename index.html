@@ -1,0 +1,55 @@
+from BLE_CEEO import Yell
+import time
+from hub import port
+import motor
+
+motors =[port.A, port.C]
+
+'''
+Small motor (essential): -660 to 660
+Medium motor: -1110 to 1110
+Large motor: -1050 to 1050
+'''
+def drive(speed):
+    motor.run(motors[0], speed)
+    motor.run(motors[1], speed)
+
+def peripheral(name):
+    try:
+        p = Yell(name, verbose = True)
+        if p.connect_up():
+            print('P connected')
+            while True:
+                if p.is_any:
+                    cmd = p.read()
+                    print(cmd)
+                    speed = 100
+                    if 'fwd' in cmd:
+                        motor.run(motors[0], speed)
+                        motor.run(motors[1], speed)
+                    elif 'right' in cmd:
+                        motor.run(motors[0], -speed)
+                        motor.run(motors[1], speed)
+                    elif 'left' in cmd:
+                        motor.run(motors[0], speed)
+                        motor.run(motors[1], -speed)
+                    elif 'back' in cmd:
+                        motor.run(motors[0], -speed)
+                        motor.run(motors[1], -speed)
+                    elif 'off' in cmd:
+                        motor.run(motors[0], 0)
+                        motor.run(motors[1], 0)
+                        
+                if not p.is_connected:
+                    print('lost connection')
+                    break
+                time.sleep(0.5)
+    except Exception as e:
+        print(e)
+    finally:
+        p.disconnect()
+        drive(0)
+        print('closing up')
+
+peripheral('Maria')
+
